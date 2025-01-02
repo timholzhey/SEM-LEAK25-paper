@@ -1,0 +1,52 @@
+MEMS motion sensors:
+- Gyrophone: https://dl.acm.org/doi/10.5555/2671225.2671292
+- PitchIn: https://dl.acm.org/doi/10.1145/3055031.3055088
+- AccelEve: https://www.researchgate.net/publication/339496042_Learning-based_Practical_Smartphone_Eavesdropping_with_Built-in_Accelerometer
+- SpearPhone: https://dl.acm.org/doi/10.1145/3448300.3468499
+- iSpyU: https://dl.acm.org/doi/10.1145/3569486
+- Kinetic Song Comprehension: https://arxiv.org/abs/1909.09123
+- AccelWord: https://dl.acm.org/doi/10.1145/2742647.2742658
+- Speechless: https://ieeexplore.ieee.org/document/8418650
+- Watch the Rythm: https://dl.acm.org/doi/10.1145/3658644.3690370
+- AccMyrinx: https://dl.acm.org/doi/10.1145/3550338
+- Vibphone: https://dl.acm.org/doi/10.1145/3494969
+- VoiceListener: https://dl.acm.org/doi/10.1145/3580789
+
+Vibration Motor:
+- Vibraphone: https://dl.acm.org/doi/10.1145/2906388.2906415
+
+Lidar:
+- Lidarphone: https://dl.acm.org/doi/10.1145/3384419.3430430
+
+Laser:
+- Lamphone: https://eprint.iacr.org/2020/708
+
+Camera:
+- The Visual Microphone: https://dl.acm.org/doi/10.1145/2601097.2601119
+
+Hard Drive PES:
+- Hard Drive of Hearing: https://ieeexplore.ieee.org/document/8835219
+- Hearing Check Failed: https://dl.acm.org/doi/10.1145/3488932.3517399
+
+Piezoelectric:
+- V-Speech: https://www.researchgate.net/publication/329954228_V-Speech_Noise-Robust_Speech_Capturing_Glasses_Using_Vibration_Sensors
+
+Photoplethysmography:
+- PPG-Hear: https://dl.acm.org/doi/10.1145/3659603
+
+Meta:
+- SoK: assessing the threat potential of vibration-based attacks against live speech using mobile sensors
+
+RFID:
+- https://dl.acm.org/doi/10.1145/3596259
+
+mmWave:
+- mmMic: https://ieeexplore.ieee.org/document/10001108
+
+WiFi:
+- ART: https://dl.acm.org/doi/10.1145/2789168.2790119
+
+Keystrokes:
+- Touchtone: https://dl.acm.org/doi/10.1145/3607199.3607203
+- Touchlogger: https://dl.acm.org/doi/10.5555/2028040.2028049
+- TapLogger: https://dl.acm.org/doi/10.1145/2185448.2185465
