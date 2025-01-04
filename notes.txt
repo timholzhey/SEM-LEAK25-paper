@@ -11,6 +11,7 @@ MEMS motion sensors:
 - AccMyrinx: https://dl.acm.org/doi/10.1145/3550338
 - Vibphone: https://dl.acm.org/doi/10.1145/3494969
 - VoiceListener: https://dl.acm.org/doi/10.1145/3580789
+- InertiEAR:
 
 Vibration Motor:
 - Vibraphone: https://dl.acm.org/doi/10.1145/2906388.2906415
@@ -50,3 +51,5 @@ Keystrokes:
 - Touchtone: https://dl.acm.org/doi/10.1145/3607199.3607203
 - Touchlogger: https://dl.acm.org/doi/10.5555/2028040.2028049
 - TapLogger: https://dl.acm.org/doi/10.1145/2185448.2185465
+
+https://developer.android.com/develop/sensors-and-location/sensors/sensors_overview#sensors-rate-limiting
