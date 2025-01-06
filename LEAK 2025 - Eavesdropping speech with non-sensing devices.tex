@@ -3,6 +3,8 @@
 \usepackage{tabularx}
 \usepackage{makecell}
 \usepackage{color,soul}
+\usepackage{tablefootnote}
+\usepackage{microtype}
 
 \newcolumntype{C}{>{\centering\arraybackslash}X} 
 
@@ -21,16 +23,18 @@
 \title{Eavesdropping Speech with Non-sensing Devices}
 
 \author{Tim Holzhey}
-\affiliation{%
+\affiliation{
+  \institution{Faculty of Electrical Engineering and Computer Science,}
   \institution{Technische Universität Berlin}
   \city{Berlin}
-  \country{Germany}}
+  \country{Germany}
+}
 \email{holzhey@campus.tu-berlin.de}
 
 \begin{abstract}
   % Topic + Relevance
-  In recent years, numerous research papers have shown that air pressure waves produced by human speech or other sounds can induce vibrations into an array of non-acoustic sensors (e.g. motions sensors) or into externally measured objects (e.g. laser-based vibrometer) skewing sensor readings in a reversable manner, effectively turning them into undisclosed microphones.
-  This allows for eavesdropping on private speech by maliciously altered devices and therefore posing a real threat to privacy when exploited.
+  In recent years, numerous research papers have shown that air pressure waves produced by human speech or other sounds can induce vibrations into an array of non-acoustic sensors (e.g. motions sensors) or into externally measured objects (e.g. laser-based vibrometer) influencing sensor readings in a reversable manner, effectively turning them into undisclosed microphones.
+  This allows for eavesdropping on private speech by compromised devices and therefore posing a real threat to privacy when exploited.
   
   % Objective of this paper
   This work will examine and compare different types of vibration-based side channel attacks employed on common IoT and Smart devices to recover speech or infer privacy-sensitive information about the speaker like their identity, political views or gender.
@@ -79,21 +83,24 @@ Many of these sensors can also be found in modern smartphones, which are carried
 The findings from vulnerabilities found in smartphones can be projected onto IoT and Smart devices with similar sensors that do not have a primary function of audio recording i.e. do not have a built-in microphone ("non-sensing").
 To execute a vibration-based eavesdropping attack, most of the previous papers took the approuch to exploited MEMS\footnote{Abbr. Micro-electromechanical systems} motion sensors (accelerometers, gyroscopes and magnetometers) commonly found in smartphones and many smart devices including smartwatches, fitness trackers, gaming controllers, etc.
 Some of the more experimental approaches have also shown that other sensors like Lidar scanners in vacuum cleaners, the position error signal of write heads in hard drives or electro-optical sensors directed at ceiling lights can be exploited for similar attacks.
+\\
+\begin{sloppypar}
+  \noindent
+  \textbf{CONTRIBUTION AND LIMITATIONS:} Although a significant part of research done in this field is investigating keystroke recovery attacks \cite{Touchtone2023}\cite{TouchLogger2011}\cite{TapLogger2012}, malicious device fingerprinting \cite{AccelerometerFingerprinting2016}\cite{MEMSFingerprinting2013} or is using sophisticated external setups (e.g. RFID-Tags \cite{RFMic2023}, millimeter-waves \cite{MMMic2022}, WiFi radio \cite{ART2015}), we limit the scope of this paper to \textbf{on-device vibration-based speech and general sound eavesdropping attacks}.
+  This includes attacks in theory possible without any modified or additional hardware assuming a compromised device or malicious software.
+  This work aims to provide a comprehensive overview of the development and current state of research (SOTA) in the field of vibration-based eavesdropping attacks on non-sensing devices.
+  We highlight notable research papers and their findings, compare the different attack methods and achieved results, and discuss the feasibility and possible countermeasures of such attacks in real-world scenarios.
+\end{sloppypar}
 
-\textbf{CONTRIBUTION:} Altough parts of the available research material in this field is investigating keystroke recovery attacks \cite{Touchtone2023}\cite{TouchLogger2011}\cite{TapLogger2012} or is using sophisticated external setups (e.g. RFID-Tags \cite{RFMic2023}, millimeter-waves \cite{MMMic2022}, WiFi radio \cite{ART2015}), we limit the scope of this paper to \textbf{on-device vibration-based speech and general sound recovery attacks}.
-This includes attacks in theory possible without any modified or additional hardware assuming a compromised device or malicious software.
-This work aims to provide a comprehensive overview of the current state of research in the field of vibration-based eavesdropping attacks on non-sensing devices.
-We highlight notable research papers and their findings, compare the different attack methods and achieved results, and discuss the feasibility of such attacks in real-world scenarios.
-
-\section{Background and Literature Review}
-\subsection{Vibration-based Eavesdropping Attacks}
+\section{Background}
+\subsection{Vibration-based Eavesdropping Side-Channel Attacks}
 Sound created by a human speaking or any other sound can be characterized as spatially and temporally propagating changes in air pressure in the audible frequency range (20 Hz - 20 kHz).
 Similarly to how sound waves induce vibrations into our eardrums to let us perceive sound, they can also couple vibrations into all other objects they encounter, more so into objects that are resonant at the frequency of the sound.
-In a typical microphone, an oscillating diaphragm is used to convert these vibrations into an electrical signal i.e. a change in voltage by varying the capacitance of a capacitor (condenser microphone) or by inducing a current into a coil (dynamic microphone).
-Even if unintended, the same phenomenon can be used to turn any other sensing electrical component into a microphone if it has a moving part capable of influencing the electrical properties of the component directly (e.g. MEMS, write head of a hard drive) or observing the movement of another object (e.g. laser vibrometer, Lidar scanner, camera).
+In a typical microphone, an oscillating diaphragm is used to convert these vibrations into an electrical signal i.e. a change in voltage by varying the capacitance of the circuit (condenser microphone) or by inducing a current into a coil (dynamic microphone).
+Even if unintended, the same phenomenon can be used to turn any other sensing electrical component into a microphone if it has a moving part capable of influencing the electrical properties of the component directly (e.g. MEMS, write head of a hard drive) or observing the spaciotemporal properties of another object (e.g. laser vibrometer, Lidar scanner, camera).
 As audible information was not intended to be captured by these sensors, an attacker who is able to recover this information from the sensor readings is exploiting a side channel vulnerability.
 
-\subsection{MEMS-based Eavesdropping Attacks}
+\subsection{MEMS}
 
 Sensors manufactured using micro-electromechanical fabrication techniques (MEMS) incorporate electronics and moving parts on a micrometer-scale chip to measure physical parameters like acceleration (accelerometer), orientation and angular velocity (gyroscope) or the magnetic field (magnetometer).
 The manufactureing process makes use of lithography and etching semiconductor manufacturing techniques on silicon wafers that allows for the production of small, low-cost sensors with high sensitivity and accuracy.
@@ -118,41 +125,25 @@ The displacement is then measured by capacitive, piezoresistive or optical sensi
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth]{embed/MEMS_accelerometer.png}
-  \caption{Accelerometer VC MEMS structure, \\Source: \textit{AccelEve} 2020 \cite{AccelEve2020}}
+  \caption{Accelerometer - Capacitive MEMS structure, \\Source: \textit{AccelEve} 2020 \cite{AccelEve2020}}
   \Description{Schematic of a MEMS accelerometer structure}
   \label{fig:MEMS_accelerometer}
 
   \vspace{0.25cm}
 
   \includegraphics[width=\linewidth]{embed/MEMS_gyroscope.png}
-  \caption{Gyroscope VC MEMS structure, \\Source: \textit{AccelEve} 2020 \cite{AccelEve2020}}
+  \caption{Gyroscope - Capacitive MEMS structure, \\Source: \textit{AccelEve} 2020 \cite{AccelEve2020}}
   \Description{Schematic of a MEMS gyroscope structure}
   \label{fig:MEMS_gyroscope}
 \end{figure}
 
-Although MEMS sensors are designed to be best insensitive to acoustic noise which could degrade their signal-to-noise ratio, they are still susceptible to sound waves that induce vibrations in the sensor structure.
-A MEMS-based eavesdropping attack exploits this vulnerability by recovering the sound-induced vibrations from the sensor readings and reconstructing the original sound.
-\\[6pt]
-\textbf{Early Work:} The first and most cited paper able to demonstrate the feasibility of recovering speech from motion sensors was \textit{Gyrophone: Recognizing Speech from Gyroscope Signals} \cite{Gyrophone2014} in 2014, a joint efffort by Yan Michalevsky \textit{et al.} from Stanford University and the National Research \& Simulation Center (Rafael Advanced Defense Systems Ltd., Isreal).
-The authors showed that a smartphone's gyroscope can be used to recover speech rendered by a nearby loudspeaker using sensor readings at a well below Nyquist sampling rate of 200 Hz.
-An Android app was developed to record the gyroscope readings without requiring any special permissions.
-Later, they used the off-the-shelf \textit{Sphinx} speech recognition system to recognize spoken digits, but also trained custom machine learning models in \textit{Matlab} to identify the speaker and their gender.
-With a limited dictionary of spoken english digits (0-9), no assumptions about the speaker and a distance of 10 cm between the loudspeaker and the smartphone on a solid table surface, a recognition accuracy of at most 26 \% was achieved.
-\\~\\
-\textbf{Recent Work:} Notably in 2023, Shijia Zhang \textit{et al.} from The Pennsylvania State University leveraged speech eavesdropping attacks using motion sensors in their paper \textit{I Spy You: Eavesdropping Continuous Speech on Smartphones via Motion Sensors} \cite{ISpyU2023} to, for the first time, provide full continuous speech recognition by jointly using accelerometer and gyroscope data.
-With a large dictionary of 9950 words and a custom ASR (Automatic Speech Recognition) deep learning model, they achieved 53.3 \% accuracy in recognizing spoken words on an Android smartphone at a sampling rate of 200-500 Hz.
-
-Most recently in 2024, Qingsong Yao \textit{et al.} from Xidian University, China published the paper \textit{Watch the Rhythm: Breaking Privacy with Accelerometer at the Extremely-Low Sampling Rate of 5Hz} \cite{WatchTheRhythm2024} in which they demonstrated that a smartphone's accelerometer can be used for eavesdropping attacks even when limited to a sampling rate of just 5 Hz.
-This was achieved by extending the machine learning algorithms to not only consider time-frequency features (spectral) but also the temporal dynamics of the signal (pause rhythm and energy intensity rhythm).
-To benchmark against previous papers, the authors showed that english spoken digits could be recognized with an accuracy of 32.70 \% at 5 Hz with an on-device Android app reading accelerometer data.
-
-\subsection{Laser-based Eavesdropping Attacks}
+\subsection{Laser-based Sensors}
 
 Laser-based measurement devices (e.g. LiDAR scanners, interferometers, vibrometers) are used in various applications to measure precise distances, velocities and material properties contactlessly in various scientific, industrial and medical applications, but recently also in consumer electronics.
 Prominently, LiDAR scanners are making their way into our daily lifes as they are used in autonomous vehicles, drones, robotic vacuum cleaners, Apple FaceID or Augumented Reality enabled smartphones.
 \\~\\
-\textbf{LiDAR Scanner:} LiDAR (Light Detection and Ranging) is a remote sensing and imaging technique that uses a pulsed laser beam to measure the distance to a target object by measuring the time it takes for the light to reflect back to the sensor (Time of Flight).
-3D LiDAR scanners can map the environment in all directions by rotating the laser beam in a horizontal plane and measuring the distance at different angles (Figure \ref{fig:LiDAR}).
+\textbf{LiDAR Scanner:} LiDAR (Light Detection and Ranging) is a remote sensing and imaging technique that uses a pulsed laser beam to measure the distance to a target object by measuring the time it takes for the light to reflect back to the sensor (Time of Flight) with known speed of light ($d=\frac{c\cdot t}{2}$).
+LiDAR systems can map the environment in all directions by rotating the laser beam in a horizontal plane (mechanical spinning LiDAR, Figure \ref{fig:LiDAR}) or by other techniques (solid-state MEMS, optical phased array, Flash LiDAR) and measuring the distance at different angles. The system can be further extended to a 3D LiDAR by adding more vertical scanning layers.
 The cummulative distance measurements can be used to create a point cloud representation of the environment.
 In order to not interfere with other optical sensors (e.g. camera, human eye), LiDAR's wavelength is mainly located in the near-infrared part of the electromagnetic spectrum (750 nm to 1.5µm).
 \\[6pt]
@@ -173,18 +164,12 @@ In order to not interfere with other optical sensors (e.g. camera, human eye), L
   \label{fig:LDV}
 \end{figure}
 
-\textbf{Recent Work:} In 2020, a group of researchers from the University of Singapore and the University of Maryland sparked the interest of the security research community \cite{BitdefenderRobotVacuumEavesdrop} and news outlets \cite{ForbesRobotVacuumEavesdrop} with their paper \textit{Spying with Your Robot Vacuum Cleaner: Eavesdropping via Lidar Sensors} ("Lidarphone") \cite{Lidarphone2020}. A method is introduced that repurposes lidar sensors in robot vacuum cleaners to function as laser-based microphones capable of capturing sound signals by detecting subtle vibrations on nearby objects.
-
-
-\subsection{Other Eavesdropping Attacks}
-\section{Threat Model}
-\section{Speech Reconstruction}
 \subsection{Speech Intelligibility}
 A human speeking in a non-tonal language like English produces a complex waveform that is composed of various frequencies in the audible range.
-While the fundamental frequency $f_0$ of the human voice is typically in the range of 100 Hz to 300 Hz (higher for women and children), overtones and consonant articulations can cover most of the audible frequency range of up to 17 kHz (Figure \ref{fig:SpeechFrequencySpectrum}).
-Research has shown that frequencies between 1 kHz and 4 kHz are most important for speech intelligibility \cite{DPAMicrophonesFactsAboutSpeechIntelligibility}.
-Applying a low-pass filter to the speech signal at 1 kHz and below quickly degrades the intelligibility of the speech to near zero as shown in Figure \ref{fig:SpeechIntelligibility}.
-Since most experimets conducted using motion sensors are limited to a sampling rate of 100-500 Hz, special techniques have to be employed to recover frequencies above the Nyquist frequency $f_N = \frac{1}{2}f_s$ that are essential for speech intelligibility.
+While the fundamental frequency $f_0$ (lowest frequency component) of the human voice is typically in the range of 100 Hz to 300 Hz (higher for women and children), overtones and consonant articulations can cover most of the audible frequency range of up to 17 kHz (Figure \ref{fig:SpeechFrequencySpectrum}).
+Research has shown that frequencies between 1 kHz and 4 kHz are most important for speech intelligibility by surveying with applied band-pass filters \cite{DPAMicrophonesFactsAboutSpeechIntelligibility}.
+Applying a low-pass filter to the speech signal at 1 kHz and below quickly degrades the intelligibility of the speech to near zero as perceived by humans (Figure \ref{fig:SpeechIntelligibility}).
+Since most experiments conducted using motion sensors are limited to a sampling rate of 100-500 Hz, machine learning techniques have to be employed to recover (fill in) frequencies above the Nyquist frequency $f_N = \frac{1}{2}f_s$ that are essential for speech intelligibility but not encoded in the sensor readings directly.
 
 \begin{figure}[H]
   \centering
@@ -201,43 +186,130 @@ Since most experimets conducted using motion sensors are limited to a sampling r
   \label{fig:SpeechIntelligibility}
 \end{figure}
 
-\subsection{Signal Processing}
-\subsection{Machine Learning}
-\subsection{Automated Speech Recognition}
-\section{Feasibility Study}
-\section{Countermeasures}
-\section{Conclusion}
+\section{Literature Review}
+\subsection{MEMS-based Eavesdropping Attacks}
 
-\begin{table*}[t]
-  \caption{Test parameters and key results from previous publications on vibration-based speech recovery attacks exploiting different sensors}
+Although MEMS sensors are designed to be best insensitive to acoustic noise which would degrade their signal-to-noise ratio, they are still susceptible to sound waves that induce vibrations in the sensor structure.
+A MEMS-based eavesdropping attack exploits this vulnerability by recovering the sound-induced vibrations from the sensor readings and reconstructing the original sound.
+These types of attacks need to overcome several challenges that include the low sampling rate of the sensors (order of magnitude 100-500 Hz) and the poor signal-to-noise ratio of the sensor readings.
+\\[6pt]
+\textbf{Early Work:} The first paper able to demonstrate the feasibility of recovering speech from motion sensors in typical smartphones was \textit{Gyrophone: Recognizing Speech from Gyroscope Signals} \cite{Gyrophone2014} in 2014 by Yan Michalevsky \textit{et al.}, a joint effort of researchers from Stanford University and the National Research \& Simulation Center (Rafael Advanced Defense Systems Ltd., Isreal).
+The authors showed that a smartphone's gyroscope can be used to recover speech rendered by a nearby loudspeaker using sensor readings at a well below Nyquist sampling rate of 200 Hz.
+An Android app was developed to record the gyroscope readings without requiring any special permissions.
+Later, they used the off-the-shelf \textit{Sphinx} speech recognition system to recognize spoken digits, but also trained custom machine learning models in \textit{Matlab} to identify the speaker and their gender.
+With a limited dictionary of spoken english digits (0-9), no assumptions about the speaker and a close distance of 10 cm between the loudspeaker and the smartphone on a solid table surface, a moderate recognition accuracy of at most 26 \% was achieved. Still, they demonstrated speaker classification of up to 50 \% and gender classification of up to 84 \%.
+This opened up the field of research to many more papers to come in the following decade building upon and considerably improving these types of attacks, primarily due to advances in machine learning.
+\\~\\
+\textbf{Recent Work:} Notably in 2023, Shijia Zhang \textit{et al.} from The Pennsylvania State University leveraged speech eavesdropping attacks using motion sensors in their paper \textit{I Spy You: Eavesdropping Continuous Speech on Smartphones via Motion Sensors} \cite{ISpyU2023} to, for the first time, provide full continuous speech recognition by jointly using accelerometer and gyroscope data.
+With a large dictionary of 9950 words and a custom ASR (Automatic Speech Recognition) deep learning model, they achieved 53.3 \% accuracy in recognizing spoken words on an Android smartphone at a sampling rate of 200-500 Hz.
+Previously, speech-related attacks were limited to classifying words from a small dictionary (e.g. dataset of 10 spoken english digits \cite{Gyrophone2014}\cite{Speechless2018}\cite{InertiEAR2022}\cite{VoiceListener2023}) or recognizing a single hotword in a stream of words (e.g. dataset of 8 cities \cite{AccelWorld2015}\cite{AccelEve2020}\cite{Vibphone2021}).
+
+Most recently in 2024, Qingsong Yao \textit{et al.} from Xidian University, China published the paper \textit{Watch the Rhythm: Breaking Privacy with Accelerometer at the Extremely-Low Sampling Rate of 5Hz} \cite{WatchTheRhythm2024} in which they demonstrated that a smartphone's accelerometer can be used for eavesdropping attacks even when limited to a sampling rate of just 5 Hz.
+This was achieved by extending the machine learning algorithms to not only consider time-frequency features (spectral) but also the temporal dynamics of the signal (pause rhythm and energy intensity rhythm) that are much better preserved in the very-low frequency domain.
+To benchmark against previous papers, the authors showed that english spoken digits could be recognized with an accuracy of 32.70 \% at 5 Hz with an on-device Android app reading accelerometer data (77.79 \% at 200 Hz).
+
+\subsection{Laser-based Eavesdropping Attacks}
+
+\textbf{Recent Work:} In 2020, a group of researchers from the University of Singapore and the University of Maryland sparked the interest of the security research community \cite{BitdefenderRobotVacuumEavesdrop} and news outlets \cite{ForbesRobotVacuumEavesdrop} with their paper \textit{Spying with Your Robot Vacuum Cleaner: Eavesdropping via Lidar Sensors} ("Lidarphone") \cite{LidarPhone2020}. A method is introduced that repurposes lidar sensors in robot vacuum cleaners to function as laser-based microphones capable of capturing sound signals by detecting subtle vibrations in nearby objects.
+After reverse-engineering and modifying the firmware of a commercial robot vacuum cleaner (Xiaomi Roborock S5) to gain access to the raw lidar data, the authors tricked the device into activating the scanner without rotating its mirror and duplicating the sensor data stream to be sent over the local network. Therefore, they could increase the sampling rate of a single point from 5 Hz to 1.8 kHz and later process the data on a remote computer offline.
+The robot's lidar scanner was aimed at different kinds of common household objects (e.g. trash can, cardboard box, plastic bag) and sounds were played back from a nearby loudspeaker.
+With an array of preprocessing steps (DC-offset correction, outlier removal, interpolation, normalization, High-pass filter, noise removal and equalization) the small signal-to-noise ratio of the sensor readings could be overcome and the authors were able to successfully identify spoken digits, the speaker's identity and gender and music snippets from popular news channels with accuracies of 91 \%, 67.5 \%, 96 \% and 90 \% respectively using classifying and correlating convolutional neural networks (CNN).
+
+\subsection{Other Eavesdropping Attacks}
+
+Other notable vibration-based speech eavesdropping side channel attacks explore methods to turn typical computer hardware and household objects into microphones.
+
+The paper \textit{Hard Drive of Hearing: Disks that Eavesdrop with a Synthesized Microphone} (2019) \cite{HardDriveOfHearing2019} by Andrew Kwong \textit{et al.} from the University of Michigan and Zhejiang University demonstrated that the position error signal (PES) of the read/write head in a hard drive can be used to recover sound signals if it were to be exposed to sound vibrations. Although not exposed to the user, if the hard drive controller's firmware is compromised, the high-fidelity PES (16-bit, 34.56 kHz) can fully encode the recorded sound signal without the need for machine learning assistance. The authors put their experimental microphone to the test by reliably detecting music played from a nearby smartphone with the \textit{Shazam} music recognition app fed with the recorded and processed PES data.
+
+Other research investigates laser vibrometers aimed at hard drive write heads (Hearing Check Failed \cite{HearingCheckFailed2022}) or an electro-optical sensor directed at ceiling lights through a telescope (Lamphone \cite{Lamphone2022}) to recover speech which is not further discussed in this paper.
+
+\section{Feasibility Study}
+We now compare 16 of the most cited research papers on local vibration-based speech eavesdropping attacks exploiting different sensors and devices published between 2014 and 2024.
+The test parameters used for the experiments and the key results achieved (metric for best speech recognition accuracy) are summarized in Table \ref{tab:PapersParametersComparison} in chronological order.
+
+\begin{table*}[ht]
+  \caption{Test parameters and key results from a timeline of previous publications on vibration-based speech eavesdropping attacks exploiting different sensors and devices}
 \label{tab:PapersParametersComparison}
 \scriptsize
 \renewcommand{\arraystretch}{1.3}
-\begin{tabularx}{\textwidth}{@{} |lp{2.0cm}|CCCCCCCC|r| @{}}
+\begin{tabularx}{\textwidth}{@{} |lp{2.0cm}|CCCCCCCC|X| @{}}
 \toprule
 \textbf{Year} & \textbf{Paper} & \textbf{Sensor} & \textbf{Measuring Device} & \textbf{Attack Goal} & \textbf{Sample Freq.} & \textbf{Audio source} & \textbf{Transmission Medium} & \textbf{Distance from source} & \textbf{Dictionary Size} & \makecell{\textbf{Speech Rec.}\\\textbf{(best)}} \\
-\hline
-2014 & Gyrophone \cite{Gyrophone2014} & Gyroscope & Android Smartphone & Speech Rec., Speaker Ident., Gender Ident. & 200 Hz & External Loudspeaker & Solid Surface & 10 cm & 11 digits & 26 \% \\ \hline
+\hline\hline
+2014 & Gyrophone \cite{Gyrophone2014} & Gyroscope & Android Smartphone & Speech Rec., Speaker Ident., Gender Ident. & 200 Hz & External Loudspeaker & Solid Surface & 10 cm & 10 digits & 26 \% \\ \hline
 2015 & AccelWorld \cite{AccelWorld2015} & Accelerometer & Android Smartphone & Speech Rec., Speaker Ident. & 200 Hz & External Loudspeaker & Air & 30 cm & 1 hotword & 85 \% \\ \hline
 2017 & PitchIn \cite{PitchIn2017} & Accelerometer, Gyroscope, Geophone & Dedicated IMCU & Speech Rec. & 1 kHz & Human & Air & 1 m & 10 words & 79 \% \\ \hline
 2018 & Speechless \cite{Speechless2018} & Accelerometer, Gyroscope & Android Smartphone & Speech Rec. & 200 Hz & External Loudspeaker & Solid Surface & 10 cm & 10 digits & 0 \% \\ \hline
 2019 & Kinetic Song Comprehension \cite{KineticSongComprehension2019} & Accelerometer, Gyroscope & Android Smartphone & Song Rec. & 100 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 100 songs & 80 \% \\ \hline
-2020 & AccelEve \cite{AccelEve2020} & Accelerometer & Android Smartphone & Speech Rec., Speaker Ident. & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 8 hotwords & 90 \% \\ \hline
-2021 & Spearphone \cite{Spearphone2021} & Accelerometer & Android Smartphone & Speech Rec., Speaker Ident., Gender Ident. & 120-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 58 words & 67 \% \\ \hline
+2020 & AccelEve \cite{AccelEve2020} & Accelerometer & Android Smartphone & Speech Rec., Speaker Ident. & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 8 hotwords,\par 36 alphanum. & 90 \% (hotwd),\par 55 \% (alnum),\par 78 \% (digits) \\ \hline
+2021 & Spearphone \cite{Spearphone2021} & Accelerometer & Android Smartphone & Speech Rec., Speaker Ident., Gender Ident. & 120-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 digits,\par 58 words & 67 \% (words),\par 71 \% (digits)\\ \hline
 2021 & Vibphone \cite{Vibphone2021} & Accelerometer & Android Smartphone & Speech Rec. & 225-425 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 hotwords + 10 digits & 54.2 \% \\ \hline
-2022 & AccMyrinx \cite{AccMyrinx2022} & Accelerometer & Android Smartphone & Speech Rec. & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & Synthesis & 57.33 \% \\ \hline
-2022 & InertiEAR \cite{InertiEAR2022} & Accelerometer, Gyroscope & Smartphone & Speech Rec. & 40-200 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 digits & 49.8 \% \\ \hline
-2023 & ISpyU \cite{ISpyU2023} & Accelerometer, Gyroscope & Android Smartphone & Automatic Speech Rec. & 200-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 9950 words & 53.3 \% \\ \hline
-2023 & VoiceListener \cite{VoiceListener2023} & Accelerometer, Gyroscope, Magnetometer & Android Smartphone & Speech Rec. & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 digits & 82.7 \% \\ \hline
-2023 & StealthyIMU \cite{StealthyIMU2023} & Accelerometer & Android Smartphone & Speech Rec. (Voice Assistant) & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 23 voice commands & - \\ \hline
-2024 & Watch the Rhythm \cite{WatchTheRhythm2024} & Accelerometer & Android Smartphone & Speech Rec., Scene Rec. & 5-200 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 digits & 77.79 \% \\
+2022 & AccMyrinx \cite{AccMyrinx2022} & Accelerometer & Android Smartphone & Speech Rec. & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & Synthesis & 42.7 \% SWER\footnote{Smoothed Word Error Rate} \\ \hline
+2022 & InertiEAR \cite{InertiEAR2022} & Accelerometer, Gyroscope & Smartphone & Speech Rec. & 40-200 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 digits & 78.8 \% \\ \hline
+2023 & ISpyU \cite{ISpyU2023} & Accelerometer, Gyroscope & Android Smartphone & Automatic Speech Rec. & 200-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 9950 words,\par 2000 words & 53.3 \% (big),\par 59.9 \% (small)\\ \hline
+2023 & VoiceListener \cite{VoiceListener2023} & Accelerometer, Gyroscope, Magnetometer & Android Smartphone & Speech Rec. & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 digits,\par 10 sentences & 82.7 \% (digits)\par 10 \% (senten)\\ \hline
+2023 & StealthyIMU \cite{StealthyIMU2023} & Accelerometer & Android Smartphone & Speech Rec. (Voice Assistant) & 100-500 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 23 voice commands & 8.46 \% SEER\footnote{Single Entity Error Rate} \\ \hline
+2024 & Watch the Rhythm \cite{WatchTheRhythm2024} & Accelerometer & Android Smartphone & Speech Rec., Scene Rec. & 5-200 Hz & Smartphone Loudspeaker & Solid Surface & On-Device & 10 dig. (en+ch),\par 28 scenes,\par 30 cities & 51 \% (dig-en),\par 47 \% (dig-ch),\par 78.7 \% (scene),\par 58.7 \% (cities)\\
 \hline\hline
-2020 & Lidarphone \cite{Lidarphone2020} & Lidar Scanner & Robot Vacuum Cleaner & Speech Rec., Song Rec., Speaker Ident., Gender Ident. & 1.8 kHz & External Loudspeaker & Air & 1.5 m & 10 digits & 91 \% \\
+2020 & Lidarphone \cite{LidarPhone2020} & Lidar Scanner & Robot Vacuum Cleaner & Speech Rec., Song Rec., Speaker Ident., Gender Ident. & 1.8 kHz & External Loudspeaker & Air & 1.5 m & 10 digits,\par 10 snippets & 91 \% (digits),\par 90 \% (snippets) \\
 \hline\hline
-2019 & Hard Drive of Hearing \cite{HardDriveOfHearing2019} & Hard Drive PES & HDD Controller & Speech Rec., Song Rec. & 34.56 kHz & External Loudspeaker & Air & 25 cm & - & 100 \% \\
+2019 & Hard Drive of Hearing \cite{HardDriveOfHearing2019} & Hard Drive PES & HDD Controller & Speech Rec., Song Rec. & 34.56 kHz & External Loudspeaker & Air & 25 cm & - & Verified,\par no metric \\
 \bottomrule
 \end{tabularx}
 \end{table*}
+
+\section{Countermeasures}
+In the following, we will discuss possible countermeasures to mitigate the risk of vibration-based eavesdropping attacks on non-sensing devices.
+
+\subsection{Limit Sensor Quality}
+One way to lower the accuracy of speech recovery attacks is to limit quality metrics of the sensor data exposed to the user.
+This can be achieved by reducing the sampling rate of the sensors further (e.g. to 50 Hz), lowering the resolution (bit depth) or by worsening the signal-to-noise ratio deliberately.
+However, this would also degrade the performance of the device's primary function and user experience (e.g. slower response to phone rotation in mobile games, aliasing artifacts in video stabilization or faults in lidar mapping).
+
+In the past, mobile operating systems have updated their APIs to limit the sampling rate of motion sensors to 200 Hz (Android \cite{AndroidDeveloperSensorDocs}) and 100 Hz (iOS \cite{AppleDeveloperAccelerometerData}\cite{AppleDeveloperGyroscopeData}) in response to privacy concerns.
+While substantially limiting malicious apps from recording high-fidelity audio with motion sensors, research has shown that speech still can be leaked at very low sampling rates (e.g. 5 Hz \cite{WatchTheRhythm2024}) to some extent.
+
+Smartphone sensors are also exposed to applications by the \textit{Sensor Web API} \cite{MDNWebDocsSensorAPI} available in many modern web browsers (Chrome, Edge, Opera).
+The World Wide Web Consortium (W3C) has acknowledged the privacy concerns of exposing inertial sensor data to the user and have proposed a \textit{Accelerometer reading quantization algorithm} \cite{W3CAccelerometerQuantization} that limits the resolution of the accelerometer XYZ readings to fixed $0.1 m/s^2$ steps.
+The W3C Editor's Draft reads:
+\begin{quote}
+  \vspace{0.1cm}
+  \textbf{§ 4. Security and Privacy Considerations} \\
+  Sensor readings provided by inertial sensors, such as accelerometer, could be used by adversaries to exploit various security threats, for example, keylogging, location tracking, fingerprinting and user identifying.
+\end{quote}
+
+\subsection{Constrain Sensor Access}
+Another way to lower the chance of a malicious app recording audio with motion sensors is to further constrain the access to the sensor data.
+While iOS is already strictly enforcing permission prompts for apps that tell the user why the app is requesting access to the device's motion data (iOS 7.0+ NSMotionUsageDescription \cite{AppleDeveloperMotionUsageDescription}), Android is granting sensor access to apps by default for up to 200 Hz. Apps need to declare the \textit{HIGH\_SAMPLING\_RATE\_SENSORS} permission to be able to sample the device's accelerometer, gyroscope, and geomagnetic field sensor at higher rates (Android 12+ \cite{AndroidDeveloperSensorDocs}).
+Since Android 9 Apps also cannot access sensors when running in background.
+Google has also acknowledged the privacy concerns of sensor-based eavesdropping attacks in the Android Developer's documentation:
+\begin{quote}
+  \vspace{0.1cm}
+  \textbf{Sensor Rate-Limiting} \\
+  {[\ldots]} \\
+  \textbf{Note:} If the user turns off microphone access using the device toggles, the motion sensors and position sensors are always rate-limited, regardless of whether you declare the HIGH\_SAMPLING\_RATE\_SENSORS permission.
+\end{quote}
+
+\noindent
+IoT devices should also introduce strict hardware-interlocks that e.g. would have prevented the robot vacuum cleaner' LiDAR investigated in \textit{Lidarphone} \cite{LidarPhone2020} from being activated without rotating the mirror.
+
+\subsection{Minimize Acoustic Coupling}
+Motion sensors should be designed to minimize the acoustic coupling to the sensor structure.
+This can be achieved by isolating the sensor from the sound source (e.g. by using a soundproof casing) or by damping the sensor structure (e.g. by using soft dampening pads around the sensor's suspension).
+Other proposals include acoustic masking by e.g. introducing white noise into the sensor.
+
+\subsection{Preprocess Audio Data}
+Recently, the authors of \textit{EveGuard: Defeating Vibration-based Side-Channel Eavesdropping with Audio Adversarial Perturbations} \cite{EveGuard2024} propose a software-driven defense mechanism which protects voice privacy by introducing adversarial perturbations into the audio signal produced by a loudspeaker.
+They develop a perturbation generator model (PGM) that effectively suppresses sensor-based eavesdropping by introducing small distortions while maintaining high audio quality using machine learning techniques.
+This audio preprocessing step could be integrated into smartphones, effectively reducing the ability of the motion sensors to recover sound from the speaker-induced vibrations.
+
+\subsection{Software Security}
+Since all eavesdropping attacks previously discussed require the attacker to have control over the device or to have installed malicious software on the device, manufacturers need to actively design their software and firmware to be secure against unauthorized access.
+For embedded and IoT devices, this mainly concerns mechanisms like secure boot, signed firmware update and encrypted data storage.
+Operating systems providing app stores should also enforce strict security policies for apps that request access to sensitive data like motion sensor data.
+Special attention should be given to the Android platform, as it is possible to side-load apps from third-party sources without the need to be scanned by the Google Play Protect service.
+
+\section{Conclusion}
 
 %%
 %% The acknowledgments section is defined using the "acks" environment
